@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-root",
@@ -40,6 +41,17 @@ export class AppComponent implements OnInit {
     this.http
       .get(
         "https://ng-basic-angular-http-default-rtdb.firebaseio.com/posts.json"
+      )
+      .pipe(
+        map((responeData) => {
+          const postsArray = [];
+          for (const key in responeData) {
+            if (responeData.hasOwnProperty(key)) {
+              postsArray.push({ ...responeData[key], key });
+            }
+          }
+          return postsArray;
+        })
       )
       .subscribe((_posts) => {
         console.log(_posts);

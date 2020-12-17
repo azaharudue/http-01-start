@@ -6,10 +6,11 @@ import { Post } from "./post.model";
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.css"],
+  styleUrls: ["./app.component.css"]
 })
 export class AppComponent implements OnInit {
-  loadedPosts = [];
+  loadedPosts: Post[] = [];
+  isFetching = false;
 
   constructor(private http: HttpClient) {}
 
@@ -25,7 +26,7 @@ export class AppComponent implements OnInit {
         "https://ng-basic-angular-http-default-rtdb.firebaseio.com/posts.json",
         postData
       )
-      .subscribe((responseData) => {
+      .subscribe(responseData => {
         console.log(responseData);
       });
   }
@@ -37,14 +38,16 @@ export class AppComponent implements OnInit {
 
   onClearPosts() {
     // Send Http request
+    this.loadedPosts = [];
   }
   private fetchPosts(): void {
+    this.isFetching = true;
     this.http
       .get<{ [key: string]: Post }>(
         "https://ng-basic-angular-http-default-rtdb.firebaseio.com/posts.json"
       )
       .pipe(
-        map((responeData) => {
+        map(responeData => {
           const postsArray: Post[] = [];
           for (const key in responeData) {
             if (responeData.hasOwnProperty(key)) {
@@ -54,8 +57,10 @@ export class AppComponent implements OnInit {
           return postsArray;
         })
       )
-      .subscribe((_posts) => {
+      .subscribe(_posts => {
         console.log(_posts);
+        this.isFetching = false;
+        this.loadedPosts = _posts;
       });
   }
 }
